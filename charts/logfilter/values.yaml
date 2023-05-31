@@ -1,0 +1,103 @@
+# logfilter values file YAML-formatted=
+
+image:
+  repository: "ghcr.io/theworkshopcom/ourapp"
+  # Define this override v{{ .Chart.AppVersion }}, which is the default
+  tag: "1.0"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: "our-app"
+
+commonLabels: {}
+
+serviceAccount:
+  create: true
+  annotations: {}
+  labels: {}
+  # Defaults to the the fullname template if empty
+  name: "ourapp-sa"
+
+deploymentAnnotations: {}
+
+podLabels: {}
+
+podAnnotations: {}
+
+shareProcessNamespace: false
+
+podSecurityContext: {}
+
+securityContext: {}
+
+# Defaults to `ClusterFirst`
+dnsPolicy:
+
+priorityClassName: ""
+
+terminationGracePeriodSeconds:
+
+env:
+# - name: PROXY_USER
+#   value: "foo"
+# - name: PROXY_PASSWORD
+#   value: "bar"
+# - name: PROXY_PORT
+#   value: "1080"
+
+service:
+  port: 80
+  annotations: {}
+
+extraVolumes:
+    - name: log-folder
+      emptyDir: {}
+
+extraVolumeMounts:
+  - name: log-folder
+    mountPath: /var/log/app
+
+livenessProbe: {}
+
+readinessProbe: {}
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+topologySpreadConstraints: []
+
+extraArgs: []
+
+deploymentStrategy:
+  type: RollingUpdate
+
+logFilter:
+  logLevel: 2
+
+  image:
+    repository: "joaoss35/logfilter"
+    tag: "1.1"
+  imagePullPolicy: IfNotPresent
+
+  env: {}
+
+  securityContext: {}
+
+  extraVolumeMounts:
+    - name: log-folder
+      mountPath: /var/log/app
+
+  livenessProbe: {}
+
+  readinessProbe: {}
+
+  resources: {}
+
+  extraArgs: {}

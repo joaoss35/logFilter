@@ -1,0 +1,16 @@
+apiVersion: v2
+name: ourapp
+description: A simple application that acts as a log filter for a legacy application
+type: application
+version: 1.0.0
+appVersion: 0.0.1
+keywords:
+  - kubernetes
+  - ourapp
+  - logging
+home: https://github.com/joaoss35/logfilter
+sources:
+  - https://github.com/joaoss35/logfilter
+maintainers:
+  - name: joaoss35
+    email: joaopachecos@hotmail.com
