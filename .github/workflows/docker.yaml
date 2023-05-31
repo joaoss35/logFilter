@@ -1,45 +1,44 @@
-name: Python Tests and Docker Build/Push
+name: Test and Build
 on:
   push:
     branches:
-      - main
+      - master
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
 jobs:
-  build-and-test:
+  build-and-push:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [linux/amd64, linux/arm64]
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Configure Docker
+        run: |
+          echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
+
+      - name: Build and Push Docker Image
+        id: docker_build
+        uses: docker/build-push-action@v2
         with:
-          python-version: 3.10
+          context: .
+          push: true
+          tags: joaoss35/logfilter:${{ steps.version.outputs.version }}
+          platforms: ${{ matrix.platform }}
 
-      - name: Install dependencies
+      - name: Get Image Digest
+        id: image_digest
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run tests
-        run: python -m unittest discover tests
-
-      - name: Authenticate with Dockerhub
-        run: echo "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-
-      - name: Get current version
-        id: get_version
-        run: echo "::set-output name=version::$(cat VERSION)"
-
-      - name: Increment minor version
-        id: increment_version
-        run: echo "::set-output name=version::$(python -c "version = '${{ steps.get_version.outputs.version }}'.split('.'); version[1] = str(int(version[1]) + 1); print('.'.join(version))")"
-
-      - name: Build and push Docker image
-        env:
-          DOCKER_IMAGE: joaoss35/logfilter
-          VERSION: ${{ steps.increment_version.outputs.version }}
-        run: |
-          docker build -t $DOCKER_IMAGE:$VERSION .
-          docker push $DOCKER_IMAGE:$VERSION
+          echo "${{ steps.docker_build.outputs.digest }}"
