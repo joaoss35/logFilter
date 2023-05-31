@@ -17,9 +17,9 @@ class TestFind(unittest.TestCase):
         os.makedirs(os.path.join(self.root_dir, "dir2"))
 
         # Create some files
-        with open(os.path.join(self.root_dir, "file1.txt"), "w"):
-            pass
         with open(os.path.join(self.root_dir, "file2.txt"), "w"):
+            pass
+        with open(os.path.join(self.root_dir, "file1.txt"), "w"):
             pass
         with open(os.path.join(self.root_dir, "file3.txt"), "w"):
             pass
@@ -38,8 +38,8 @@ class TestFind(unittest.TestCase):
         result = app.find("*.txt", self.root_dir)
         expected = [
             os.path.join(self.root_dir, "file2.txt"),
-            os.path.join(self.root_dir, "file3.txt"),
-            os.path.join(self.root_dir, "file1.txt")
+            os.path.join(self.root_dir, "file1.txt"),
+            os.path.join(self.root_dir, "file3.txt")
         ]
         self.assertEqual(result, expected)
 
