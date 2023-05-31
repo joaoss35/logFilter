@@ -1,0 +1,45 @@
+name: Python Tests and Docker Build/Push
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m unittest discover tests
+
+      - name: Authenticate with Dockerhub
+        run: echo "${{ secrets.DOCKERHUB_USERNAME }}:${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Get current version
+        id: get_version
+        run: echo "::set-output name=version::$(cat VERSION)"
+
+      - name: Increment minor version
+        id: increment_version
+        run: echo "::set-output name=version::$(python -c "version = '${{ steps.get_version.outputs.version }}'.split('.'); version[1] = str(int(version[1]) + 1); print('.'.join(version))")"
+
+      - name: Build and push Docker image
+        env:
+          DOCKER_IMAGE: joaoss35/logfilter
+          VERSION: ${{ steps.increment_version.outputs.version }}
+        run: |
+          docker build -t $DOCKER_IMAGE:$VERSION .
+          docker push $DOCKER_IMAGE:$VERSION
