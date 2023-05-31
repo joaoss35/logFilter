@@ -7,6 +7,8 @@ COPY app.py /output/app/app.py
 
 FROM python:3.9-alpine
 
+LABEL maintainer="Joao Pacheco joaopachecos@hotmail.com"
+
 # Create a non-root user and group
 RUN addgroup -S logfilter && adduser -S logfilter -G logfilter
 
@@ -20,5 +22,8 @@ COPY --chown=logfilter:logfilter --from=source-code /output /
 # Since I don't have any dependencies, no reason for copying and installing requirements.txt
 # COPY requirements.txt ./
 # RUN pip install -r requirements.txt
+
+LABEL version="1.0" \
+      description="A log filter for a legacy application"
 
 CMD ["python", "app.py"]
