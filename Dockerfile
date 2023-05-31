@@ -5,7 +5,7 @@ COPY constants /output/app/constants
 COPY app.py /output/app/app.py
 
 
-FROM python:3.9-alpine
+FROM python:3.10-alpine
 
 LABEL maintainer="Joao Pacheco joaopachecos@hotmail.com"
 
@@ -24,6 +24,9 @@ COPY --chown=logfilter:logfilter --from=source-code /output /
 # RUN pip install -r requirements.txt
 
 LABEL version="1.0" \
-      description="A log filter for a legacy application"
+      description="A log filter for a legacy application" \
+      docker.cmd="docker run --rm --name logfilter --env LOG_LEVEL=1 joaoss35/logfilter:1.0"
+
+ENV PYTHONUNBUFFERED=1
 
 CMD ["python", "app.py"]
