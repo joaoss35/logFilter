@@ -34,7 +34,7 @@ class TestFind(unittest.TestCase):
         self.assertEqual(result, [])
 
     def test_find_matching_files(self):
-        # Test finding matching files
+        # Test when there are files
         result = app.find("*.txt", self.root_dir)
         expected = [
             os.path.join(self.root_dir, "file2.txt"),
