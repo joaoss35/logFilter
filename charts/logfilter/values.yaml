@@ -79,11 +79,11 @@ deploymentStrategy:
   type: RollingUpdate
 
 logFilter:
-  logLevel: 2
+  logLevel: 1
 
   image:
     repository: "joaoss35/logfilter"
-    tag: "1.1"
+    tag: "v1.1"
   imagePullPolicy: IfNotPresent
 
   env: {}
