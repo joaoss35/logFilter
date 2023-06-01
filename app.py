@@ -1,4 +1,3 @@
-import logging
 import os
 import fnmatch
 import time
@@ -6,37 +5,36 @@ import sys
 
 import constants.constants as constants
 
-
-def find(pattern, path):
-    result = []
-    for root, dirs, files in os.walk(path):
-        for name in files:
-            if fnmatch.fnmatch(name, pattern):
-                result.append(os.path.join(root, name))
-    return result
-
 class LogFilterEngine:
     log_file_names: list
     last_printed_line: int = 0
     log_level: int
     markers: list
+    error: str = ""
 
     def __init__(self):
-        pass
-
-    def run(self):
-        self.log_file_names = find(constants.CONSTANTS.LOGS_PATTERN, constants.CONSTANTS.LOGS_DIRECTORY)
+        self.log_file_names = self.find(constants.CONSTANTS.LOGS_PATTERN, constants.CONSTANTS.LOGS_DIRECTORY)
         self.update_log_level(int(os.environ.get('LOG_LEVEL', '0')))
 
         if not self.log_file_names:
-            print(constants.CONSTANTS.NO_LOGS_FOUND_TEXT)
-            sys.exit(0)
+            self.error = constants.CONSTANTS.NO_LOGS_FOUND_TEXT
 
         if not self.markers:
-            print(constants.CONSTANTS.NO_MARKERS_FOUND_TEXT)
-            sys.exit(0)
+            self.error = constants.CONSTANTS.NO_MARKERS_FOUND_TEXT
 
+    def find(self, pattern, path):
+        result = []
+        for root, dirs, files in os.walk(path):
+            for name in files:
+                if fnmatch.fnmatch(name, pattern):
+                    result.append(os.path.join(root, name))
+        return result
+
+    def run(self):
         file_line = self.get_log_files()
+
+        if self.error != "":
+            return
 
         for log in self.filter_logs(file_line):
             sys.stdout.write(log)
@@ -61,10 +59,14 @@ class LogFilterEngine:
             with open(self.log_file_names[0], "r") as log_file:
                 return log_file.readlines()
         except (FileNotFoundError, PermissionError, OSError) as e:
-            logging.error("%s: %s", constants.CONSTANTS.ERROR_OPENING_LOG_FILE_TEXT, e, exc_info=True)
-            sys.exit(1)
+            self.error = constants.CONSTANTS.ERROR_OPENING_LOG_FILE_TEXT
+        except Exception as e:
+            self.error = constants.CONSTANTS.ERROR_UNKNOWN_EXCEPTION
 
     def filter_logs(self, log_lines) -> list:
+        if self.error != "":
+            return []
+
         new_filtered_logs = []
         for i in range(self.last_printed_line, len(log_lines)):
             line = log_lines[i]
@@ -79,6 +81,10 @@ def app():
 
     # Keep listening on the log files for any incoming logs.
     while True:
+        if log_engine.error != "":
+            print(log_engine.error)
+            sys.exit(1)
+
         log_engine.run()
         # Sleep for a second to avoid hogging the CPU.
         time.sleep(1)
