@@ -83,7 +83,7 @@ logFilter:
 
   image:
     repository: "joaoss35/logfilter"
-    tag: "v1.1"
+    tag: "v1.2"
   imagePullPolicy: IfNotPresent
 
   env: {}
