@@ -26,9 +26,6 @@ class LogFilterEngine:
 
     def run(self):
         self.log_file_names = find(constants.CONSTANTS.LOGS_PATTERN, constants.CONSTANTS.LOGS_DIRECTORY)
-
-        file_line = self.get_log_files()
-
         self.update_log_level(int(os.environ.get('LOG_LEVEL', '0')))
 
         if not self.log_file_names:
@@ -38,6 +35,8 @@ class LogFilterEngine:
         if not self.markers:
             print(constants.CONSTANTS.NO_MARKERS_FOUND_TEXT)
             sys.exit(0)
+
+        file_line = self.get_log_files()
 
         for log in self.filter_logs(file_line):
             sys.stdout.write(log)
