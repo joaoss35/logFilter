@@ -12,8 +12,13 @@ class LogFilterEngine:
     markers: list
     error: str = ""
 
-    def __init__(self):
-        self.log_file_names = self.find(constants.CONSTANTS.LOGS_PATTERN, constants.CONSTANTS.LOGS_DIRECTORY)
+    # log_file_names needs to be None by default because of the tests and to be able to mock the logs files
+    def __init__(self, log_file_names=None):
+        if log_file_names is None:
+            log_file_names = self.find(constants.CONSTANTS.LOGS_PATTERN, constants.CONSTANTS.LOGS_DIRECTORY)
+
+        self.log_file_names = log_file_names
+
         self.update_log_level(int(os.environ.get('LOG_LEVEL', '0')))
 
         if not self.log_file_names:
