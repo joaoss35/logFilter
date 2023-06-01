@@ -15,19 +15,6 @@ def find(pattern, path):
                 result.append(os.path.join(root, name))
     return result
 
-# // engine =  LogFilterEngine()
-# //Given
-# // engine.log_file_names = "mocked file"
-# // engine.lastPrintedLine = 3
-# //engine.log level = 3
-#
-# //When
-# let filterlogs = engine.filerLogs()
-#
-# //Then
-# espero ter so 1 log
-# que o lasPrinted line passe a 2
-
 class LogFilterEngine:
     log_file_names: list
     last_printed_line: int = 0
@@ -35,7 +22,12 @@ class LogFilterEngine:
     markers: list
 
     def __init__(self):
+        pass
+
+    def run(self):
         self.log_file_names = find(constants.CONSTANTS.LOGS_PATTERN, constants.CONSTANTS.LOGS_DIRECTORY)
+
+        file_line = self.get_log_files()
 
         self.update_log_level(int(os.environ.get('LOG_LEVEL', '0')))
 
@@ -46,10 +38,7 @@ class LogFilterEngine:
         if not self.markers:
             print(constants.CONSTANTS.NO_MARKERS_FOUND_TEXT)
             sys.exit(0)
-        pass
 
-    def run(self):
-        file_line = self.get_log_files()
         for log in self.filter_logs(file_line):
             sys.stdout.write(log)
 
