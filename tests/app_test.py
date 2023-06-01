@@ -14,7 +14,7 @@ class LogFilterEngineTest(unittest.TestCase):
             "2023-05-30 15:56:40,303 ERROR: Failed to connect to the database"
         ]
 
-        engine = app.LogFilterEngine()
+        engine = app.LogFilterEngine(log_file_names=["/var/log/app/mock.log"])
         engine.update_log_level(2)
         filtered_logs = engine.filter_logs(logs)
         self.assertEqual(filtered_logs, logs)
@@ -25,7 +25,7 @@ class LogFilterEngineTest(unittest.TestCase):
             "2023-05-30 15:57:50,390 INFO: The server is running smoothly",
             "2023-05-30 15:56:40,303 ERROR: Failed to connect to the database"
         ]
-        engine = app.LogFilterEngine()
+        engine = app.LogFilterEngine(log_file_names=["/var/log/app/mock.log"])
         engine.update_log_level(1)
         filtered_logs = engine.filter_logs(logs)
         self.assertEqual(
@@ -42,7 +42,7 @@ class LogFilterEngineTest(unittest.TestCase):
             "2023-05-30 15:57:50,390 INFO: The server is running smoothly",
             "2023-05-30 15:56:40,303 ERROR: Failed to connect to the database"
         ]
-        engine = app.LogFilterEngine()
+        engine = app.LogFilterEngine(log_file_names=["/var/log/app/mock.log"])
         engine.update_log_level(5)
         filtered_logs = engine.filter_logs(logs)
         self.assertEqual(filtered_logs, [])
@@ -55,7 +55,7 @@ class LogFilterEngineTest(unittest.TestCase):
             "2023-05-30 15:56:40,303 WARNING: The system is running out of memory",
             "2023-05-30 15:56:40,303 ERROR: Failed to connect to the database"
         ]
-        engine = app.LogFilterEngine()
+        engine = app.LogFilterEngine(log_file_names=["/var/log/app/mock.log"])
         engine.update_log_level(2)
         engine.last_printed_line = 3
         filtered_logs = engine.filter_logs(logs)
@@ -71,7 +71,7 @@ class LogFilterEngineTest(unittest.TestCase):
             "2023-05-30 15:57:50,390 INFO: The server is running smoothly",
             "2023-05-30 15:56:40,303 ERROR: Failed to connect to the database"
         ]
-        engine = app.LogFilterEngine()
+        engine = app.LogFilterEngine(log_file_names=["/var/log/app/mock.log"])
         engine.update_log_level(0)
         filtered_logs = engine.filter_logs(logs)
         self.assertEqual(
@@ -87,7 +87,7 @@ class LogFilterEngineTest(unittest.TestCase):
             "2023-05-30 15:57:50,390 INFO: The server is running smoothly",
             "2023-05-30 15:56:40,303 ERROR: Failed to connect to the database"
         ]
-        engine = app.LogFilterEngine()
+        engine = app.LogFilterEngine(log_file_names=["/var/log/app/mock.log"])
         engine.last_printed_line = 3
         engine.update_log_level(2)
         filtered_logs = engine.filter_logs(logs)
@@ -102,7 +102,7 @@ class LogFilterEngineTest(unittest.TestCase):
             "2023-05-30 15:57:50,390 INFO: The server is running smoothly",
             "2023-05-30 15:56:40,303 ERROR: Failed to connect to the database"
         ]
-        engine = app.LogFilterEngine()
+        engine = app.LogFilterEngine(log_file_names=["/var/log/app/mock.log"])
         engine.last_printed_line = 2
         engine.update_log_level(2)
         filtered_logs = engine.filter_logs(logs)
