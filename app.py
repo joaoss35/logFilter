@@ -15,52 +15,83 @@ def find(pattern, path):
                 result.append(os.path.join(root, name))
     return result
 
+# // engine =  LogFilterEngine()
+# //Given
+# // engine.log_file_names = "mocked file"
+# // engine.lastPrintedLine = 3
+# //engine.log level = 3
+#
+# //When
+# let filterlogs = engine.filerLogs()
+#
+# //Then
+# espero ter so 1 log
+# que o lasPrinted line passe a 2
 
-def get_markers_level(log_level) -> list:
-    match log_level:
-        case 0:
-            markers = [constants.CONSTANTS.MARKERS[0]]
-        case 1:
-            markers = constants.CONSTANTS.MARKERS[:2]
-        case 2:
-            markers = constants.CONSTANTS.MARKERS
-        case _:
-            markers = []
-    return markers
+class LogFilterEngine:
+    log_file_names: list
+    last_printed_line: int = 0
+    log_level: int
+    markers: list
 
+    def __init__(self):
+        self.log_file_names = find(constants.CONSTANTS.LOGS_PATTERN, constants.CONSTANTS.LOGS_DIRECTORY)
 
+        self.update_log_level(int(os.environ.get('LOG_LEVEL', '0')))
 
-def app():
-    log_file_names = find(constants.CONSTANTS.LOGS_PATTERN, constants.CONSTANTS.LOGS_DIRECTORY)
-    last_printed_line = 0
+        if not self.log_file_names:
+            print(constants.CONSTANTS.NO_LOGS_FOUND_TEXT)
+            sys.exit(0)
 
-    log_level = int(os.environ.get('LOG_LEVEL', '0'))
-    markers = get_markers_level(log_level)
+        if not self.markers:
+            print(constants.CONSTANTS.NO_MARKERS_FOUND_TEXT)
+            sys.exit(0)
+        pass
 
-    if not log_file_names:
-        print(constants.CONSTANTS.NO_LOGS_FOUND_TEXT)
-        sys.exit(0)
+    def run(self):
+        file_line = self.get_log_files()
+        for log in self.filter_logs(file_line):
+            sys.stdout.write(log)
 
-    if not markers:
-        print(constants.CONSTANTS.NO_MARKERS_FOUND_TEXT)
-        sys.exit(0)
+    def update_markers_level(self):
+        match self.log_level:
+            case 0:
+                self.markers = [constants.CONSTANTS.MARKERS[0]]
+            case 1:
+                self.markers = constants.CONSTANTS.MARKERS[:2]
+            case 2:
+                self.markers = constants.CONSTANTS.MARKERS
+            case _:
+                self.markers = []
 
-    # Keep listening on the log files for any incoming logs.
-    while True:
+    def update_log_level(self, log_level: int):
+        self.log_level = log_level
+        self.update_markers_level()
+
+    def get_log_files(self) -> list:
         try:
-            with open(log_file_names[0], "r") as log_file:
-                file_lines = log_file.readlines()
-
-                # Print only new unprinted lines
-                for i in range(last_printed_line, len(file_lines)):
-                    line = file_lines[i]
-                    if any(marker in line for marker in markers):
-                        sys.stdout.write(line)
-                        last_printed_line = i + 1
+            with open(self.log_file_names[0], "r") as log_file:
+                return log_file.readlines()
         except (FileNotFoundError, PermissionError, OSError) as e:
             logging.error("%s: %s", constants.CONSTANTS.ERROR_OPENING_LOG_FILE_TEXT, e, exc_info=True)
             sys.exit(1)
 
+    def filter_logs(self, log_lines) -> list:
+        new_filtered_logs = []
+        for i in range(self.last_printed_line, len(log_lines)):
+            line = log_lines[i]
+            if any(marker in line for marker in self.markers):
+                new_filtered_logs.append(line)
+                self.last_printed_line = i + 1
+        return new_filtered_logs
+
+
+def app():
+    log_engine = LogFilterEngine()
+
+    # Keep listening on the log files for any incoming logs.
+    while True:
+        log_engine.run()
         # Sleep for a second to avoid hogging the CPU.
         time.sleep(1)
 

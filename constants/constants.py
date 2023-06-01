@@ -5,4 +5,3 @@ class CONSTANTS(enumerate):
     NO_MARKERS_FOUND_TEXT = "Please define a valid LOG_LEVEL value. Exiting..."
     MARKERS = ["ERROR", "WARNING", "INFO"]
     ERROR_OPENING_LOG_FILE_TEXT = "Error opening log file"
-
