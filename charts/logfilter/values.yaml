@@ -39,13 +39,7 @@ priorityClassName: ""
 
 terminationGracePeriodSeconds:
 
-env:
-# - name: PROXY_USER
-#   value: "foo"
-# - name: PROXY_PASSWORD
-#   value: "bar"
-# - name: PROXY_PORT
-#   value: "1080"
+env: []
 
 service:
   port: 80
@@ -83,7 +77,7 @@ logFilter:
 
   image:
     repository: "joaoss35/logfilter"
-    tag: "v1.2"
+    tag: "v1.3"
   imagePullPolicy: IfNotPresent
 
   env: {}
